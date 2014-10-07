@@ -16,7 +16,11 @@ module LogStashLogger
     protected
 
     def build_event(message, severity, time)
-      data = message
+      # THIS IS A HACK
+      if defined? Rails.application.class.parent_name.constantize.config
+        log_tags = Rails.application.class.parent_name.constantize.config.log_tags
+      end
+      data = log_tags.nil? ? message : log_tags + ' ' + message
       if data.is_a?(String) && data.start_with?('{')
         data = (JSON.parse(message) rescue nil) || message
       end
